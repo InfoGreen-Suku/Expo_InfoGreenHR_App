@@ -1,0 +1,125 @@
+import { scaleFont } from "@/constants/ScaleFont";
+import { Dimensions, StyleSheet } from "react-native";
+const ScreenWidth = Dimensions.get('window').width;
+const ScreenHeight = Dimensions.get('window').height;
+export const styles = StyleSheet.create({
+    background: {
+      flex: 1,
+      resizeMode: 'contain',
+      justifyContent: 'flex-start',
+    },
+    container: {
+      flex: 1,
+      justifyContent: 'flex-start',
+      alignItems: 'center',
+    },
+    input: {
+      width: '80%',
+      height: 40,
+      borderBottomWidth: 2,
+      borderBottomColor: '#009333',
+      marginBottom: 10,
+      paddingHorizontal: 10,
+      paddingTop: 0,
+      paddingBottom: 0,
+      // paddingVertical: 0,
+      color: 'black',
+      fontSize: scaleFont(17),
+    },
+    text: {
+      marginBottom: 5,
+      fontWeight: '300',
+      color: '#009333',
+      alignSelf: 'flex-start',
+      paddingHorizontal: 30,
+      fontSize: scaleFont(17),
+      fontFamily: 'Poppins-Light',
+    },
+    header: {
+      marginBottom: 20,
+      fontWeight: 'bold',
+      color: '#009333',
+      alignSelf: 'center',
+      fontSize: scaleFont(22),
+      fontFamily: 'Poppins-Light',
+    },
+    button: {
+      marginTop: 20,
+      marginBottom: 10,
+      alignSelf: 'center',
+      // height: 40,
+      // width: 200,
+      // borderRadius: 50,
+    },
+    error: {
+      color: 'red',
+      alignSelf: 'flex-start',
+      fontFamily: 'Poppins-Light',
+      fontSize: scaleFont(17),
+      paddingHorizontal: 30,
+    },
+    cameraContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      backgroundColor: '#fff',
+      
+    },
+    cameraPreview: {
+      width: ScreenWidth,
+      height: ScreenHeight,
+      marginTop: scaleFont(30), // Adjusted height to leave space for the header
+    },
+    modalView: {
+      margin: 20,
+      marginTop: '80%',
+      backgroundColor: 'transparent',
+      borderRadius: 20,
+      padding: 35,
+      alignItems: 'center',
+      shadowColor: '#fff',
+      shadowOffset: {
+        width: 0,
+        height: 2,
+      },
+      shadowOpacity: 0.25,
+      shadowRadius: 4,
+      elevation: 5,
+    },
+    cameraHeader: {
+      position: 'relative',
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      padding: 10,
+      backgroundColor: '#009333',
+      width: ScreenWidth,
+      zIndex: 1,
+      marginTop: ScreenHeight*0.05,
+    },
+    barcodeText: {
+      textAlign: 'justify',
+      fontSize: scaleFont(18),
+      marginLeft: 4,
+      fontWeight: 'bold',
+      color: '#fff',
+    },
+    camerabordercontainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginVertical: 20, // Added margin for better visibility
+      height: ScreenHeight,
+    },
+    scannerFrame: {
+      position: 'absolute',
+      top: '30%',
+      left: '10%',
+      width: '80%',
+      height: '40%',
+      justifyContent: 'center',
+      alignItems: 'center',
+      borderWidth: 3,
+      borderColor: '#009333',
+      borderRadius: 20,
+    },
+  });

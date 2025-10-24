@@ -1,0 +1,60 @@
+{
+  "expo": {
+    "name": "SVSF_HR",
+    "slug": "SVSF_HR",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/Images/Logo.png",
+    "scheme": "svsfhr",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.svsfhr.app"
+    },
+    "android": {
+      "edgeToEdgeEnabled": true,
+      "predictiveBackGestureEnabled": false,
+      "package": "com.svsfhr.app"
+    },
+    "web": {
+      "output": "static",
+      "favicon": "./assets/Images/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/Images/Logo.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#ffffff",
+          "dark": {
+            "backgroundColor": "#000000"
+          }
+        }
+      ],
+      [
+        "onesignal-expo-plugin",
+        {
+          "mode": "production"
+        }
+      ],
+      "expo-camera",
+      "expo-audio",
+      "expo-video",
+      "expo-share-intent"
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "e1e8f161-59bc-497a-ad76-0fe79d741ac3"
+      }
+    }
+  }
+}

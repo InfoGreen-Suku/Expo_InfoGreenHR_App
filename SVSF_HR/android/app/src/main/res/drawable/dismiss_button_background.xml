@@ -1,0 +1,15 @@
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    
+   
+    
+    <!-- Set the border/stroke of the button -->
+    <stroke
+        android:width="4dp"
+        android:color="#33FFFFFF"/>
+
+    <!-- Set the size of the button to make it circular -->
+    <size
+        android:width="100dp" 
+        android:height="100dp" />
+</shape>
