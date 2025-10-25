@@ -21,9 +21,7 @@ export default function MainNavigator() {
 
  
   return (
-    <SafeAreaView style={{ flex: 1,backgroundColor:'#009333'}}>
     <MainStack.Navigator screenOptions={{ headerShown: false }} initialRouteName={"Webview"}>
-      {/* <MainStack.Screen name="PendingScreen" component={PendingScreen} /> */}
       <MainStack.Screen name="PermissionScreen" component={PermissionScreen} />
       <MainStack.Screen name="VerificationScreen" component={VerificationScreen} />
       <MainStack.Screen name="OpenLink" component={OpenLink} />
@@ -37,7 +35,6 @@ export default function MainNavigator() {
       <MainStack.Screen name="ApiLogsScreen" component={ApiLogsScreen} />
       <MainStack.Screen name="Network" component={Network} />
     </MainStack.Navigator>
-    </SafeAreaView>
   )
 }
 

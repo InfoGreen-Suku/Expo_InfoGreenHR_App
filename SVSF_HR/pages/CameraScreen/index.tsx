@@ -31,12 +31,12 @@ import * as Location from 'expo-location';
 import { styles } from './style';
 
 const CameraScreen = ({ route }: any) => {
-  const { ClientId } = route.params ?? {};
+  const { Watermark } = route.params ?? {};
   const { Path } = route.params ?? {};
   const [imageUri, setImageUri] = useState<string | null>(null);
   const [showCamera, setShowCamera] = useState(true);
   const dispatch = useDispatch();
-  const [facing, setFacing] = useState<CameraType>('back');
+  const [facing, setFacing] = useState<CameraType>('front');
   const [dateTime, setDateTime] = useState('');
   const [location, setLocation] = useState<any | null>(null);
   const [isFetchingLocation, setIsFetchingLocation] = useState(false); // Add loading state
@@ -106,10 +106,10 @@ const CameraScreen = ({ route }: any) => {
   };
 
   const RequestPermission = async () => {
-    const granted = await PermissionsAndroid.requestMultiple(
-      [PermissionsAndroid.PERMISSIONS.CAMERA, PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION],
+    const granted = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.CAMERA
     );
-    if (granted['android.permission.CAMERA'] === PermissionsAndroid.RESULTS.GRANTED && granted['android.permission.ACCESS_FINE_LOCATION'] === PermissionsAndroid.RESULTS.GRANTED) {
+    if (granted === PermissionsAndroid.RESULTS.GRANTED) {
       return true;
     } else {
       setPermissionModalVisible(true);
@@ -221,7 +221,7 @@ const CameraScreen = ({ route }: any) => {
       const height: any = await getImageSize(imagePath);
       console.log(height);
 
-      const Watermark = `${dateTime} | Lat: ${location?.coords?.latitude || 'N/A'} | Long: ${location?.coords?.longitude || 'N/A'}`;
+      // const Watermark = `${dateTime} | Lat: ${location?.coords?.latitude || 'N/A'} | Long: ${location?.coords?.longitude || 'N/A'}`;
 
       const texts = [
         {
@@ -264,8 +264,6 @@ const CameraScreen = ({ route }: any) => {
         name: 'image.jpg', // You can adjust the filename as needed
         type: 'image/jpeg', // Adjust the MIME type if needed
       });
-      formData.append('ClientID', ClientId);
-
       // Send the FormData object to the API
       const details = await PostFile(formData, Path);
       dispatch({ type: 'POST_IMAGE_SUCCESS', payload: details });

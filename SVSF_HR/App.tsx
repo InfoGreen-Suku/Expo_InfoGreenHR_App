@@ -10,7 +10,7 @@ import {
 import { ShareIntentProvider } from "expo-share-intent";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useRef } from "react";
-import { Text, TextInput, useColorScheme } from "react-native";
+import { Text, TextInput, useColorScheme, View } from "react-native";
 import { LogLevel, OneSignal } from "react-native-onesignal";
 import "react-native-reanimated";
 import { SafeAreaProvider, useSafeAreaInsets } from "react-native-safe-area-context";
@@ -105,11 +105,14 @@ function Root() {
   };
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <StatusBar style="light" />
-      <NavigationContainer>
-         <MainNavigator />
+      <View style={{ flex: 1 }}>
+        <StatusBar style="light" />
+        <View style={{ height:insets.top, backgroundColor: '#009333' }} />
+        <NavigationContainer>
+        <MainNavigator />
       </NavigationContainer>
-
-    </ThemeProvider>
-  )
+      <View style={{ height:insets.bottom }} />
+    </View>
+  </ThemeProvider>
+);
 }

@@ -22,7 +22,7 @@ import Share from 'react-native-share';
 
 import { Linking } from 'react-native';
 import { WebView } from 'react-native-webview';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 // import ReceiveSharingIntent from 'react-native-receive-sharing-intent';
 import { scaleFont } from '@/constants/ScaleFont';
 // import { startReminderService } from '@/hooks/BackgroundReminder';
@@ -36,6 +36,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useShareIntent } from 'expo-share-intent';
 import DeviceInfo from 'react-native-device-info';
 import { startReminderService } from '@/hooks/BackgroundReminder';
+import { postUserDetails } from '@/hooks/api/postUserDetails';
+import { getLogs } from '@/hooks/logger/apiLogger';
+ 
 
 export default function Webview() {
   const SharedFile_URL = useSelector((store: any) => store?.user?.SharedFile_URL);
@@ -55,7 +58,6 @@ export default function Webview() {
   const [scannedDataArray, setScannedDataArray] = useState<any[]>([]);
   const [DownloadmodalVisible, setDownloadModalVisible] = useState(false);
   const [PrintmodalVisible, setPrintModalVisible] = useState(false);
-  const [AndroidID, setAndroidID] = useState('');
   const { hasShareIntent, shareIntent, resetShareIntent, error } = useShareIntent();
   //  whatsapp message
   const [messagesSent, setMessagesSent] = useState<any[]>([]);
@@ -67,14 +69,16 @@ export default function Webview() {
   const [facing, setFacing] = useState<CameraType>('back');
   const [appOpenCount, setAppOpenCount] = useState(0);
   const lastReviewRequest = useRef<number>(0);
+  const hasPostedRef = useRef(false);
   const [appState, setAppState] = useState(AppState.currentState);
   const [isWebViewLoaded, setIsWebViewLoaded] = useState(false);
-  const [appVersion, setAppVersion] = useState<string | null>(null);
   const [subscriptionID, setSubscriptionID] = useState<string | null>(null);
   const [scanned, setScanned] = useState(false);
   const canGoBackRef = useRef(false);
   const lastBackPressRef = useRef(0);
   const [permissionModalVisible, setPermissionModalVisible] = useState(false);
+  const dispatch = useDispatch();
+  const [deviceInfo, setDeviceInfo] = useState<any>(null);
   // Function to check network status if network is not detected it navigate to network page
 
   // const callHtmlFunction = () => {
@@ -152,9 +156,106 @@ export default function Webview() {
     }
   }, [messages]);
 
+  useEffect(() => {
+    getId();
+    getAllDeviceInfo();
+  }, [])
 
 
 
+  useEffect(() => {
+    if (subscriptionID && deviceInfo?.subscriptionID !== subscriptionID) {
+      setDeviceInfo((prev: any) => ({ ...prev, subscriptionID }));
+    }
+  }, [subscriptionID, deviceInfo]);
+
+  useEffect(() => {
+    if (deviceInfo?.subscriptionID && !hasPostedRef.current) {
+      hasPostedRef.current = true;
+      postDeviceInfo();
+    }
+  }, [deviceInfo]);
+  const postDeviceInfo = async () => {
+    try {
+      const details = await postUserDetails(deviceInfo);
+      dispatch({ type: 'POST_USER_SUCCESS', payload: details });
+      console.log("details", details);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const getAllDeviceInfo = async () => {
+    try {
+      const [
+        androidApiLevel,
+        androidID,
+        brand,
+        systemName,
+        systemVersion,
+        applicationBuildVersion,
+        operatorName,
+        device,
+        deviceID,
+        deviceName,
+        fontScale,
+        hardware,
+        ipAddress,
+        macAddress,
+        manufacturer,
+        modal,
+        productName,
+        applicationVersion,
+      ] = await Promise.all([
+        DeviceInfo.getApiLevel(),
+        DeviceInfo.getAndroidId(),
+        DeviceInfo.getBrand(),
+        DeviceInfo.getSystemName(),
+        DeviceInfo.getSystemVersion(),
+        DeviceInfo.getBuildNumber(),
+        DeviceInfo.getCarrier(),
+        DeviceInfo.getDevice(),
+        DeviceInfo.getDeviceId(),
+        DeviceInfo.getDeviceName(),
+        DeviceInfo.getFontScale(),
+        DeviceInfo.getHardware(),
+        DeviceInfo.getIpAddress(),
+        DeviceInfo.getMacAddress(),
+        DeviceInfo.getManufacturer(),
+        DeviceInfo.getModel(),
+        DeviceInfo.getProduct(),
+        DeviceInfo.getVersion(),
+
+      ]);
+      const deviceInfo = {
+        androidApiLevel,
+        androidID,
+        brand,
+        systemName,
+        systemVersion,
+        applicationBuildVersion,
+        operatorName,
+        device,
+        deviceID,
+        deviceName,
+        fontScale,
+        hardware,
+        ipAddress,
+        macAddress,
+        manufacturer,
+        modal,
+        productName,
+        applicationVersion,
+      };
+      setDeviceInfo(deviceInfo);
+    } catch (error) {
+      console.error('Error getting device info:', error);
+    }
+  };
+  const getId = async () => {
+    const id = await AsyncStorage.getItem('subscriptionId');
+    setSubscriptionID(id);
+  };
   const checkAndRequestReview = async () => {
     console.log(appOpenCount);
 
@@ -179,10 +280,7 @@ export default function Webview() {
     }
   };
 
-  const getId = async () => {
-    const id = await AsyncStorage.getItem('subscriptionId');
-    setSubscriptionID(id);
-  };
+  
 
   const checkPermissions = async () => {
     const isAndroid10OrAbove = Platform.OS === 'android' && Number(Platform.Version) > 31;
@@ -199,15 +297,8 @@ export default function Webview() {
   };
 
   useEffect(() => {
-    // getting androidID
-    DeviceInfo.getAndroidId().then(androidId => {
-      setAndroidID(androidId);
-    });
-    const appversion = DeviceInfo.getBuildNumber()
-    setAppVersion(appversion);
-    getId();
     checkPermissions();
-    startReminderService();
+    // startReminderService();
 
     // Handle app state changes for review
 
@@ -430,8 +521,8 @@ export default function Webview() {
 
      (function() {
       // Override the function to capture its parameters
-      window.camera = function(ClientID,DataRef,Idname) {
-        window.ReactNativeWebView.postMessage("camera"+ "&SPLIT&" + DataRef + "&SPLIT&" + ClientID+"&SPLIT&"+Idname);
+      window.camera = function(url,text) {
+        window.ReactNativeWebView.postMessage("camera"+ "&SPLIT&" + url + "&SPLIT&" + text);
       };
     })();
 
@@ -640,8 +731,8 @@ export default function Webview() {
         setaudio_Url_Id(index2);
       }
       if (action === 'camera') {
-        navigation.navigate('Camera', { ClientId: index1, Path: index });
-        setImage_Url_Id(index2);
+        navigation.navigate('Camera', {Watermark: index1, Path: index});
+        // setImage_Url_Id(index2);
       }
       if (action === 'print') {
         convertUrlToPdf(index, index1, index2);
@@ -824,7 +915,7 @@ export default function Webview() {
         </Modal>
       </View>
       <WebView
-        userAgent={`${appVersion}/infogreen-c-app/${AndroidID}/${subscriptionID}`}
+        userAgent={`${deviceInfo?.applicationBuildVersion}/infogreen-c-app/${deviceInfo?.androidID}/${subscriptionID}`}
         source={{ uri: "https://svsf.co.in" }}
         startInLoadingState
         renderLoading={() => (
@@ -849,10 +940,10 @@ export default function Webview() {
         onError={(e) => {
           const { description } = e.nativeEvent;
           console.warn('WebView Error:', description);
-          if(description==="net::ERR_INTERNET_DISCONNECTED"){
+          if (description === "net::ERR_INTERNET_DISCONNECTED") {
             navigation.navigate('Network');
           }
-          else{
+          else {
             Alert.alert('Page Load Error', description, [
               { text: 'Retry', onPress: () => webViewRef.current?.reload() },
             ]);

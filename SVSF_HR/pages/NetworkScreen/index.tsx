@@ -20,7 +20,7 @@ export default function Network() {
           ]) // Navigate to network error page
         }
         else{
-          handlerefresh()
+          navigation.navigate("Webview")
         } 
       });
     };
@@ -29,37 +29,16 @@ export default function Network() {
 
       // checking the user details before exiting the app if userdetails is null it will take user to myform page other take to webview
       try {
-        const savedUserDetails = await AsyncStorage.getItem('userDetails');
-        if(savedUserDetails===null){
-          navigation.navigate("WelcomeScreen")
-          BackHandler.exitApp();
-        }else{
-          checkNetworkStatus()
-          BackHandler.exitApp();
-        }
+        BackHandler.exitApp()
       } catch (error) {
         console.log(error);
       }
         
     }
     
-// handle refresh button for refresh the page after getting network
 
-    const handlerefresh=async()=>{
-      try {
-        const savedUserDetails = await AsyncStorage.getItem('userDetails');
-        if(savedUserDetails===null){
-          navigation.navigate("WelcomeScreen")
-        }else{
-          Alert.alert('Something Wrong!','Please Close the app and Reopen again.',[
-            {text:'ok',onPress:(()=>BackHandler.exitApp())}
-          ])
-        }
-      } catch (error) {
-        console.log(error);
-      }
-        
-    }
+
+  
     
   return (
     <View style={styles.conatiner}>
