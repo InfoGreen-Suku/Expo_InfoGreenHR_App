@@ -32,14 +32,14 @@ if ((TextInput as any).defaultProps == null) (TextInput as any).defaultProps = {
 
 export default function RootLayout() {
 
-  const requestPermissions = async () => {
-    await ensureOverlayPermission();
-    await ensureExactAlarmPermission();
-    await ensureNotificationPermission();
-  }
-  useEffect(() => {
-    requestPermissions();
-  }, []);
+  // const requestPermissions = async () => {
+  //   await ensureOverlayPermission();
+  //   await ensureExactAlarmPermission();
+  //   await ensureNotificationPermission();
+  // }
+  // useEffect(() => {
+  //   requestPermissions();
+  // }, []);
   return (
     <ShareIntentProvider>
       <Provider store={store}>
