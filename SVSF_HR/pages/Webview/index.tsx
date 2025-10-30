@@ -38,6 +38,7 @@ import DeviceInfo from 'react-native-device-info';
 import { startReminderService } from '@/hooks/BackgroundReminder';
 import { postUserDetails } from '@/hooks/api/postUserDetails';
 import { getLogs } from '@/hooks/logger/apiLogger';
+import { OneSignal } from 'react-native-onesignal';
  
 
 export default function Webview() {
@@ -157,8 +158,10 @@ export default function Webview() {
   }, [messages]);
 
   useEffect(() => {
+   
     getId();
     getAllDeviceInfo();
+    waitForSubscriptionId();
   }, [])
 
 
@@ -177,11 +180,17 @@ export default function Webview() {
   }, [deviceInfo]);
   const postDeviceInfo = async () => {
     try {
-      const details = await postUserDetails(deviceInfo);
+      const userDetails ={
+        userId: deviceInfo.androidID,
+        appName: deviceInfo.appName,
+        deviceInfo: deviceInfo,
+        subscriptionID: subscriptionID,
+      }
+      const details = await postUserDetails(userDetails);
       dispatch({ type: 'POST_USER_SUCCESS', payload: details });
       console.log("details", details);
     } catch (error) {
-      console.log(error);
+      console.log("error", error);
     }
   }
 
@@ -206,6 +215,7 @@ export default function Webview() {
         modal,
         productName,
         applicationVersion,
+        appName
       ] = await Promise.all([
         DeviceInfo.getApiLevel(),
         DeviceInfo.getAndroidId(),
@@ -225,7 +235,8 @@ export default function Webview() {
         DeviceInfo.getModel(),
         DeviceInfo.getProduct(),
         DeviceInfo.getVersion(),
-
+        DeviceInfo.getApplicationName(),
+        
       ]);
       const deviceInfo = {
         androidApiLevel,
@@ -246,6 +257,7 @@ export default function Webview() {
         modal,
         productName,
         applicationVersion,
+        appName
       };
       setDeviceInfo(deviceInfo);
     } catch (error) {
@@ -255,6 +267,32 @@ export default function Webview() {
   const getId = async () => {
     const id = await AsyncStorage.getItem('subscriptionId');
     setSubscriptionID(id);
+  };
+
+  const waitForSubscriptionId = async (retries: number = 10, delayMs: number = 1000) => {
+    try {
+      for (let i = 0; i < retries; i++) {
+        const id = await AsyncStorage.getItem('subscriptionId');
+        if (id) {
+          setSubscriptionID(id);
+          console.log('Webview subscriptionId available:', id);
+          return;
+        }
+        await new Promise(resolve => setTimeout(resolve, delayMs));
+      }
+      try {
+        const fetchedId = await OneSignal.User.pushSubscription.getIdAsync();
+        if (fetchedId) {
+          await AsyncStorage.setItem('subscriptionId', String(fetchedId));
+          setSubscriptionID(fetchedId);
+          console.log('Webview fetched subscriptionId from OneSignal:', fetchedId);
+        }
+      } catch (err) {
+        console.log('Webview failed to fetch subscriptionId from OneSignal:', err);
+      }
+    } catch (error) {
+      console.log('Webview error waiting for subscriptionId:', error);
+    }
   };
   const checkAndRequestReview = async () => {
     console.log(appOpenCount);

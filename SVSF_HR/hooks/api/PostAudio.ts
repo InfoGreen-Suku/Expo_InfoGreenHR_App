@@ -1,4 +1,4 @@
-import apiClient from '../logger/apiClient';
+import axios from "axios";
 
 export const  PostAudio= async(formData: any,url: any)=> {
     console.log("formData",formData);
@@ -9,7 +9,7 @@ export const  PostAudio= async(formData: any,url: any)=> {
       if (apiAudioUrl==='') {
         apiAudioUrl = 'https://infogreen.synology.me:82/api.php'; // Fallback URL
       }
-        const response = await apiClient.post(apiAudioUrl, formData, {
+        const response = await axios.post(apiAudioUrl, formData, {
             headers: {
               'Content-Type': 'multipart/form-data',
             },

@@ -1,4 +1,4 @@
-import apiClient from '../logger/apiClient';
+import axios from "axios";
 
 export const  PostFile= async(formData: any,url: any)=> {
     console.log("formdata_img",url);
@@ -10,7 +10,7 @@ export const  PostFile= async(formData: any,url: any)=> {
         // apiImageUrl = 'https://infogreen.synology.me:82/api.php'; 
         apiImageUrl = 'https://rk12.infogreen.in/test.php'; // Fallback URL
       }
-        const response = await apiClient.post(apiImageUrl, formData, {
+        const response = await axios.post(apiImageUrl, formData, {
             headers: {
               'Content-Type': 'multipart/form-data',
             },

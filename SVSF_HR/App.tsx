@@ -59,15 +59,23 @@ function Root() {
   useEffect(() => {
     OneSignal.Debug.setLogLevel(LogLevel.Verbose);
     OneSignal.initialize("0e92107b-915a-41d3-9570-bb3d3430ab72");
-    OneSignal.User.pushSubscription
-      .getIdAsync()
-      .then((subscriptionId: any) => {
-        AsyncStorage.setItem('subscriptionId', subscriptionId);
-        // You can use this ID to identify the user or send it to your server
-      })
-      .catch(error => {
-        console.log('Failed to get subscription ID:', error);
-      });
+    const attemptStoreSubscriptionId = async (retries = 5, delayMs = 1000) => {
+      for (let i = 0; i < retries; i++) {
+        try {
+          const subscriptionId: any = await OneSignal.User.pushSubscription.getIdAsync();
+          if (subscriptionId) {
+            await AsyncStorage.setItem('subscriptionId', String(subscriptionId));
+            console.log('Stored subscriptionId:', subscriptionId);
+            return;
+          }
+        } catch (error) {
+          console.log('Failed to get subscription ID attempt', i + 1, error);
+        }
+        await new Promise(resolve => setTimeout(resolve, delayMs));
+      }
+      console.log('Subscription ID not available after retries');
+    };
+    attemptStoreSubscriptionId();
     OneSignal.Notifications.addEventListener("click", (event: any) => {
       const navigationData = event.notification.additionalData.navigation;
       const userId = event.notification.additionalData.userId;

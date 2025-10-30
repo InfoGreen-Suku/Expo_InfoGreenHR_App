@@ -1,10 +1,9 @@
-import apiClient from '../logger/apiClient';
-
+import axios from "axios";
 export const  PostSharedFile= async(formData: any)=> {
     // console.log(formData);
     try {
         let apiSharedfileUrl = 'https://infogreen.synology.me:82/api.php'; // Fallback URL
-        const response = await apiClient.post(apiSharedfileUrl, formData, {
+        const response = await axios.post(apiSharedfileUrl, formData, {
             headers: {
               'Content-Type': 'multipart/form-data',
             },
